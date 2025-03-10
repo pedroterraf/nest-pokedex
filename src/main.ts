@@ -9,11 +9,17 @@ async function bootstrap() {
 
   app.useGlobalPipes(
     new ValidationPipe({
-    whitelist: true,
-    forbidNonWhitelisted: true,
-    })
-    );
+      // Validacion general a todos los endpoints
+      whitelist: true, // Validacion para las props que se le pasan al endpoint
+      forbidNonWhitelisted: true, // BadRequest para cuando envian una prop que no necesita el endpoint
+      transform: true, // Habilito que transforme la informacion que fluye por dtos
+      transformOptions: {
+        enableImplicitConversion: true, // Habilito que transforme la informacion que fluye por dtos
+      },
+    }),
+  );
 
-  await app.listen(process.env.PORT || 3000);
+  await app.listen(process.env.PORT ?? 3000);
+  console.log(`App running on port ${process.env.PORT}`);
 }
 bootstrap();

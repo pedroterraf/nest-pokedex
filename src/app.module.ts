@@ -1,20 +1,28 @@
 import { Module } from '@nestjs/common';
+import { CommonModule } from './common/common.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
-import { PokemonModule } from './pokemon/pokemon.module';
+import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
-import { CommonModule } from './common/common.module';
+import { PokemonModule } from './pokemon/pokemon.module';
 import { SeedModule } from './seed/seed.module';
+import { EnvConfiguration } from './config/env.config';
+import { JoiValidationSchema } from './config/joi.validation';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      load: [EnvConfiguration], // Conversiones y mapeos de las envs
+      validationSchema: JoiValidationSchema, // Validaciones para las envs
+    }),
+
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'public'),
     }),
 
-    MongooseModule.forRoot(
-      process.env.MONGO_URI ?? 'mongodb://localhost:27017/nest-pokemon',
-    ),
+    MongooseModule.forRoot(process.env.MONGODB ?? '', {
+      dbName: 'pokemonsdb',
+    }),
 
     PokemonModule,
 
